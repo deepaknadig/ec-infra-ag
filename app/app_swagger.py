@@ -2,6 +2,7 @@ from flask import Flask, Response, Blueprint
 from flask import request, jsonify
 from flask_restx import Api, Resource, fields
 import sys
+from pymongo import MongoClient
 
 app = Flask(__name__)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
@@ -57,9 +58,19 @@ class DeviceWelcomePage(Resource):
     def get(self):
         """Print Welcome Page."""
         host_address = request.host
+
+        # client = MongoClient('mongodb://localhost:27017/')
+        client = MongoClient('mongodb://mongo-flask-app:27017/')
+        db = client["testdb"]
+        col = db["sensors"]
+
+        sensordict = {"name": "sens77", "type": "windspeed"}
+
+        x = col.insert_one(sensordict)
         return Response('''<h1>Sensor Measurement Archive</h1>
             <p>A prototype API for IoT device measurements.</p>
-            <h3>Host Address: {}</h3>'''.format(host_address))
+            <h3>Host Address: {}</h3>
+            <h3>Sensor ID: {}</h3>'''.format(host_address, x.inserted_id))
 
 
 @ns.route('/device')
