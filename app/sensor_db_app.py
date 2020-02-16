@@ -1,9 +1,8 @@
 from flask import Flask, Response, Blueprint
-from flask import request, jsonify
 from flask_restx import Api, Resource, fields
 from pymongo import MongoClient
 import decision as dc
-from bson.json_util import dumps, loads, default
+from bson.json_util import dumps, loads
 
 app = Flask(__name__)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
@@ -11,8 +10,7 @@ app.config.SWAGGER_UI_REQUEST_DURATION = True
 app.config.RESTX_MASK_SWAGGER = False
 
 # db_statement
-#client = MongoClient('mongodb://mongo-flask-app:27017/')
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient('mongodb://mongo-flask-app:27017/')
 db = client["testdb"]
 col = db["measurements"]
 
@@ -102,7 +100,6 @@ measurements = [
 ]
 
 # populate DB
-#col.delete_many({})
 for msrmt in measurements:
     col.insert_one(msrmt)
 
@@ -150,7 +147,6 @@ class ReceiveNDVIMeasurements(Resource):
         """Add measurement"""
         measurement = api.payload
         measurement['type'] = "ndvi_sensor"
-        # print(measurement, file=sys.stdout)
 
         # # db_statement
         col.insert_one(measurement)
@@ -200,8 +196,8 @@ class DecisionByLocation(Resource):
             "timestamp": timestamp,
             "type": 'ndvi_sensor'
         })
-        for i in range(i_loc, i_loc+2):
-            for j in range (j_loc, j_loc+2):
+        for i in range(i_loc, i_loc + 2):
+            for j in range(j_loc, j_loc + 2):
                 n_result = col.find_one({
                     "i_loc": {'$in': [i_loc]},
                     "j_loc": {'$in': [j_loc]},
