@@ -15,4 +15,4 @@ RUN pip install -r requirements.txt
 # We copy the rest of the codebase into the image
 COPY . .
 
-CMD [ "python", "app/app_swagger.py" ]
+CMD [ "python", "app/sensor_db_app.py" ]
