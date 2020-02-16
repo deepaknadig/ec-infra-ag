@@ -1,7 +1,6 @@
 from flask import Flask, Response, Blueprint
 from flask import request, jsonify
 from flask_restx import Api, Resource, fields
-import sys
 from pymongo import MongoClient
 import decision as dc
 from bson.json_util import dumps, loads, default
@@ -11,9 +10,8 @@ app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.config.SWAGGER_UI_REQUEST_DURATION = True
 app.config.RESTX_MASK_SWAGGER = False
 
-#db_statement
-client = MongoClient('mongodb://localhost:27017/')
-# client = MongoClient('mongodb://mongo-flask-app:27017/')
+# db_statement
+client = MongoClient('mongodb://mongo-flask-app:27017/')
 db = client["testdb"]
 col = db["measurements"]
 
@@ -85,51 +83,46 @@ measurements = [
      'timestamp': 1,
      'type': 'n_sensor'},
     {'K': 125,
-      'N': 50,
-      'P': 4,
-      'i_loc': 1,
-      'id': 4,
-      'j_loc': 1,
-      'timestamp': 1,
-      'type': 'n_sensor'},
+     'N': 50,
+     'P': 4,
+     'i_loc': 1,
+     'id': 4,
+     'j_loc': 1,
+     'timestamp': 1,
+     'type': 'n_sensor'},
     {'K': 115,
-      'N': 49,
-      'P': 3.5,
-      'i_loc': 1,
-      'id': 5,
-      'j_loc': 0,
-      'timestamp': 1,
-      'type': 'n_sensor'}
+     'N': 49,
+     'P': 3.5,
+     'i_loc': 1,
+     'id': 5,
+     'j_loc': 0,
+     'timestamp': 1,
+     'type': 'n_sensor'}
 ]
 
-#populate DB
+# populate DB
 col.delete_many({})
 for msrmt in measurements:
-  col.insert_one(msrmt).inserted_id
+    col.insert_one(msrmt)
+
 
 @ns.route('/')
 class DeviceWelcomePage(Resource):
     """Shows the welcome page and list of measurements."""
-    @ns.doc(description='Shows the welcome page.')
-    def get(self):
-        """Print Welcome Page and list of measurements."""
-        host_address = request.host
-
-        return Response('''<h1>Sensor Measurement Archive</h1>
-            <p>A prototype API for IoT device measurements.</p>
-            <h3>Host Address: {}</h3>''')
-            #<h3>Sensor ID: {}</h3>'''.format(host_address, jsonify(measurements)))
 
     @ns.doc(description='Shows a list of all measurements service APIs.')
     def get(self):
         """Get all measurements."""
         result = col.find()
-        return jsonify(dumps(result, default=default))
+        # TODO: find() is not scalable.
+        return Response(response=dumps(result), status=201, mimetype="application/json")
 
-## READ IN DATA AND SAVE TO DB
+
+# READ IN DATA AND SAVE TO DB
 @ns.route('/nutrients')
 class ReceiveNutrientMeasurements(Resource):
     """Get new nutrients measurement service APIs."""
+
     @ns.doc(description='Add new nutrients measurement.')
     @ns.expect(n_sensor_model)
     @ns.marshal_with(n_sensor_model, code=201)
@@ -137,13 +130,13 @@ class ReceiveNutrientMeasurements(Resource):
         """Add measurement"""
         measurement = api.payload
         measurement['type'] = "n_sensor"
-        # print(measurement, file=sys.stdout)
 
         # db_statement
-        newElement = col.insert_one(measurement).inserted_id
+        col.insert_one(measurement)
         measurement['id'] = measurements[-1]['id'] + 1
         measurements.append(measurement)
         return measurement, 201
+
 
 @ns.route('/ndvi')
 class ReceiveNDVIMeasurements(Resource):
@@ -159,10 +152,11 @@ class ReceiveNDVIMeasurements(Resource):
         # print(measurement, file=sys.stdout)
 
         # # db_statement
-        newElement = col.insert_one(measurement).inserted_id
+        col.insert_one(measurement)
         measurement['id'] = measurements[-1]['id'] + 1
         measurements.append(measurement)
         return measurement, 201
+
 
 @ns.route('/wind')
 class ReceiveWindMeasurements(Resource):
@@ -175,15 +169,15 @@ class ReceiveWindMeasurements(Resource):
         """Add measurement"""
         measurement = api.payload
         measurement['type'] = "w_sensor"
-        # print(measurement, file=sys.stdout)
 
-        # # db_statement
-        newElement = col.insert_one(measurement).inserted_id
+        # db_statement
+        col.insert_one(measurement)
         measurement['id'] = measurements[-1]['id'] + 1
         measurements.append(measurement)
         return measurement, 201
 
-## READ DATA FROM DB AND CONPUTE DECISION
+
+# READ DATA FROM DB AND CONPUTE DECISION
 @ns.route('/<int:i_loc>/<int:j_loc>/<int:timestamp>')
 @ns.response(404, 'No measurements for location and time specified.')
 @ns.param('i_loc', 'i coordinate of the grid cell')
@@ -192,42 +186,42 @@ class ReceiveWindMeasurements(Resource):
 class DecisionByLocation(Resource):
     @ns.doc(description='Show fertilizer decision by location.',
             params={'i_loc': 'i coordinate of the grid cell',
-            'j_loc': 'j coordinate of the grid cell',
-            'timestamp': 'timestamp of the measurement'})
+                    'j_loc': 'j coordinate of the grid cell',
+                    'timestamp': 'timestamp of the measurement'})
     def get(self, i_loc, j_loc, timestamp):
         """Show measurement for a specific location at a certain time"""
 
-        ndvi_result = col.find_one( {
-          "i_loc": i_loc,
-          "j_loc": j_loc,
-          "timestamp": timestamp,
-          "type": 'ndvi_sensor'
-        } )
-        n_result = col.find( {
-          "i_loc": { '$in': [ i_loc, i_loc+1] },
-          "j_loc": { '$in': [ j_loc, j_loc+1] },
-          "timestamp": timestamp,
-          "type": "n_sensor"
-        } )
-        w_result = col.find_one( {
-          "timestamp": timestamp,
-          "type": "w_sensor"
+        ndvi_result = col.find_one({
+            "i_loc": i_loc,
+            "j_loc": j_loc,
+            "timestamp": timestamp,
+            "type": 'ndvi_sensor'
         })
-        N=[]
-        K=[]
-        P=[]
+        n_result = col.find({
+            "i_loc": {'$in': [i_loc, i_loc + 1]},
+            "j_loc": {'$in': [j_loc, j_loc + 1]},
+            "timestamp": timestamp,
+            "type": "n_sensor"
+        })
+        w_result = col.find_one({
+            "timestamp": timestamp,
+            "type": "w_sensor"
+        })
+        N = []
+        K = []
+        P = []
         for msrmt in n_result:
-          N.append(msrmt.get('N'))
-          P.append(msrmt.get('P'))
-          K.append(msrmt.get('K'))
+            N.append(msrmt.get('N'))
+            P.append(msrmt.get('P'))
+            K.append(msrmt.get('K'))
 
-        result = list(n_result)+list(w_result)+list(ndvi_result)
+        result = list(n_result) + list(w_result) + list(ndvi_result)
 
         if len(result) > 0:
-          # Calls the decision making method if entries are found
-          dec = dc.fertilizer_decision(N, P, K, ndvi_result.get("NDVI"), w_result.get("wind speed"), timestamp)
-          newElement = col.insert_one(loads(dec)).inserted_id
-          return dec
+            # Calls the decision making method if entries are found
+            dec = dc.fertilizer_decision(N, P, K, ndvi_result.get("NDVI"), w_result.get("wind speed"), timestamp)
+            col.insert_one(loads(dec))
+            return Response(response=dec, status=200, mimetype="application/json")
 
         api.abort(404, "Device ID {} doesn't exist".format(id))
 
