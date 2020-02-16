@@ -1,9 +1,8 @@
 from flask import Flask, Response, Blueprint
-from flask import request, jsonify
 from flask_restx import Api, Resource, fields
 from pymongo import MongoClient
 import decision as dc
-from bson.json_util import dumps, loads, default
+from bson.json_util import dumps, loads
 
 app = Flask(__name__)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
@@ -101,7 +100,6 @@ measurements = [
 ]
 
 # populate DB
-col.delete_many({})
 for msrmt in measurements:
     col.insert_one(msrmt)
 
@@ -149,7 +147,6 @@ class ReceiveNDVIMeasurements(Resource):
         """Add measurement"""
         measurement = api.payload
         measurement['type'] = "ndvi_sensor"
-        # print(measurement, file=sys.stdout)
 
         # # db_statement
         col.insert_one(measurement)
@@ -190,32 +187,33 @@ class DecisionByLocation(Resource):
                     'timestamp': 'timestamp of the measurement'})
     def get(self, i_loc, j_loc, timestamp):
         """Show measurement for a specific location at a certain time"""
-
+        N = []
+        K = []
+        P = []
         ndvi_result = col.find_one({
             "i_loc": i_loc,
             "j_loc": j_loc,
             "timestamp": timestamp,
             "type": 'ndvi_sensor'
         })
-        n_result = col.find({
-            "i_loc": {'$in': [i_loc, i_loc + 1]},
-            "j_loc": {'$in': [j_loc, j_loc + 1]},
-            "timestamp": timestamp,
-            "type": "n_sensor"
-        })
+        for i in range(i_loc, i_loc + 2):
+            for j in range(j_loc, j_loc + 2):
+                n_result = col.find_one({
+                    "i_loc": {'$in': [i_loc]},
+                    "j_loc": {'$in': [j_loc]},
+                    "timestamp": timestamp,
+                    "type": "n_sensor"
+                })
+                N.append(n_result.get('N'))
+                P.append(n_result.get('P'))
+                K.append(n_result.get('K'))
+
         w_result = col.find_one({
             "timestamp": timestamp,
             "type": "w_sensor"
         })
-        N = []
-        K = []
-        P = []
-        for msrmt in n_result:
-            N.append(msrmt.get('N'))
-            P.append(msrmt.get('P'))
-            K.append(msrmt.get('K'))
 
-        result = list(n_result) + list(w_result) + list(ndvi_result)
+        result = N + list(w_result) + list(ndvi_result)
 
         if len(result) > 0:
             # Calls the decision making method if entries are found
