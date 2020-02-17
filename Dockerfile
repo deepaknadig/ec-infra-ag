@@ -1,10 +1,10 @@
 FROM python:3.8
 LABEL maintainer="deepnadig@gmail.com"
 
-ENV APP /app
+ENV STAGE /staging
 
-RUN mkdir $APP
-WORKDIR $APP
+RUN mkdir $STAGE
+WORKDIR $STAGE
 
 # Copy requirements file
 COPY requirements.txt .
@@ -15,4 +15,9 @@ RUN pip install -r requirements.txt
 # We copy the rest of the codebase into the image
 COPY . .
 
-CMD [ "python", "app/sensor_db_app.py" ]
+ENV FLASK_APP app
+ENV FLASK_ENVIRONMENT development
+ENV FLASK_DEBUG=1
+
+
+CMD ["flask", "run", "--host=0.0.0.0"]

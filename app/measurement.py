@@ -1,32 +1,15 @@
 from flask import Flask, Response, Blueprint
-from flask_restx import Api, Resource, fields
+from flask_restx import Api, Resource, fields, Namespace
 from pymongo import MongoClient
-import decision as dc
+import app.decision as dc
 from bson.json_util import dumps, loads
-
-app = Flask(__name__)
-app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
-app.config.SWAGGER_UI_REQUEST_DURATION = True
-app.config.RESTX_MASK_SWAGGER = False
 
 # db_statement
 client = MongoClient('mongodb://mongo-flask-app:27017/')
 db = client["testdb"]
 col = db["measurements"]
 
-api_v1 = Blueprint('api', __name__, url_prefix='/api/v1')
-
-api = Api(api_v1,
-          version="1.0",
-          title="Ag-IoT Services API",
-          description="Manage API services for various Ag-IoT devices.",
-          doc='/doc/',
-          contact="Deepak Nadig",
-          default_mediatype='application/json')
-
-app.register_blueprint(api_v1)
-
-ns = api.namespace('measurements', description='Manage Ag-IoT device API services.')
+api = Namespace('measurements', description='Manage Ag-IoT measurement API services.')
 
 # All models:
 #   Nutrients sensors: n_sensor
@@ -104,11 +87,11 @@ for msrmt in measurements:
     col.insert_one(msrmt)
 
 
-@ns.route('/')
+@api.route('/')
 class DeviceWelcomePage(Resource):
     """Shows the welcome page and list of measurements."""
 
-    @ns.doc(description='Shows a list of all measurements service APIs.')
+    @api.doc(description='Shows a list of all measurements service APIs.')
     def get(self):
         """Get all measurements."""
         result = col.find()
@@ -117,13 +100,13 @@ class DeviceWelcomePage(Resource):
 
 
 # READ IN DATA AND SAVE TO DB
-@ns.route('/nutrients')
+@api.route('/nutrients')
 class ReceiveNutrientMeasurements(Resource):
     """Get new nutrients measurement service APIs."""
 
-    @ns.doc(description='Add new nutrients measurement.')
-    @ns.expect(n_sensor_model)
-    @ns.marshal_with(n_sensor_model, code=201)
+    @api.doc(description='Add new nutrients measurement.')
+    @api.expect(n_sensor_model)
+    @api.marshal_with(n_sensor_model, code=201)
     def post(self):
         """Add measurement"""
         measurement = api.payload
@@ -136,13 +119,13 @@ class ReceiveNutrientMeasurements(Resource):
         return measurement, 201
 
 
-@ns.route('/ndvi')
+@api.route('/ndvi')
 class ReceiveNDVIMeasurements(Resource):
     """Get new NDVI measurement service APIs."""
 
-    @ns.doc(description='Add new NDVI measurement.')
-    @ns.expect(ndvi_sensor_model)
-    @ns.marshal_with(ndvi_sensor_model, code=201)
+    @api.doc(description='Add new NDVI measurement.')
+    @api.expect(ndvi_sensor_model)
+    @api.marshal_with(ndvi_sensor_model, code=201)
     def post(self):
         """Add measurement"""
         measurement = api.payload
@@ -155,13 +138,13 @@ class ReceiveNDVIMeasurements(Resource):
         return measurement, 201
 
 
-@ns.route('/wind')
+@api.route('/wind')
 class ReceiveWindMeasurements(Resource):
     """Get new wind speed measurement service APIs."""
 
-    @ns.doc(description='Add new wind speed measurement.')
-    @ns.expect(w_sensor_model)
-    @ns.marshal_with(w_sensor_model, code=201)
+    @api.doc(description='Add new wind speed measurement.')
+    @api.expect(w_sensor_model)
+    @api.marshal_with(w_sensor_model, code=201)
     def post(self):
         """Add measurement"""
         measurement = api.payload
@@ -175,13 +158,13 @@ class ReceiveWindMeasurements(Resource):
 
 
 # READ DATA FROM DB AND CONPUTE DECISION
-@ns.route('/<int:i_loc>/<int:j_loc>/<int:timestamp>')
-@ns.response(404, 'No measurements for location and time specified.')
-@ns.param('i_loc', 'i coordinate of the grid cell')
-@ns.param('j_loc', 'j coordinate of the grid cell')
-@ns.param('timestamp', 'timestamp of measurement')
+@api.route('/<int:i_loc>/<int:j_loc>/<int:timestamp>')
+@api.response(404, 'No measurements for location and time specified.')
+@api.param('i_loc', 'i coordinate of the grid cell')
+@api.param('j_loc', 'j coordinate of the grid cell')
+@api.param('timestamp', 'timestamp of measurement')
 class DecisionByLocation(Resource):
-    @ns.doc(description='Show fertilizer decision by location.',
+    @api.doc(description='Show fertilizer decision by location.',
             params={'i_loc': 'i coordinate of the grid cell',
                     'j_loc': 'j coordinate of the grid cell',
                     'timestamp': 'timestamp of the measurement'})
@@ -222,7 +205,3 @@ class DecisionByLocation(Resource):
             return Response(response=dec, status=200, mimetype="application/json")
 
         api.abort(404, "Device ID {} doesn't exist".format(id))
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
