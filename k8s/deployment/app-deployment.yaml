@@ -34,6 +34,7 @@ spec:
         app: flask-app
         tier: frontend
     spec:
+      terminationGracePeriodSeconds: 10
       containers:
         - name: flask-app
           image: deepnadig/flask-app:latest

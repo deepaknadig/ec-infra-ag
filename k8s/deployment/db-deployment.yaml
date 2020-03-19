@@ -45,6 +45,7 @@ spec:
         app: flask-app
         tier: mongo
     spec:
+      terminationGracePeriodSeconds: 10
       containers:
       - image: mongo:4
         name: mongo
