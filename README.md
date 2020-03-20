@@ -1,5 +1,7 @@
 # Edge Computing Infrastructure for Ag-IoT
 
+A wiki is under development [HERE](https://git.deepaknadig.com/deepak/ec-infra-ag/-/wikis/home).
+
 ### Docker image
 To build the docker image, run:
 ```shell script
