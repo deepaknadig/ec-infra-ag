@@ -33,9 +33,10 @@ printf '%s\n' --------------------
 printf "Starting NFS service...\n"
 printf '%s\n' --------------------
 sudo systemctl daemon-reload
-sudo systemctl start nfs-server.service
-sudo systemctl restart nfs-server.service
-sudo systemctl status nfs-server.service
+sudo systemctl enable rpcbind.service
+sudo systemctl enable nfs-kernel-server
+sudo systemctl restart nfs-kernel-server.service
+sudo systemctl status nfs-kernel-server.service
 printf '%s\n' --------------------
 printf "Done.\n"
 printf '%s\n' --------------------
