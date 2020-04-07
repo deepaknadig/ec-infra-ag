@@ -1,5 +1,7 @@
-FROM python:3.8
-LABEL maintainer="deepnadig@gmail.com"
+FROM python:3.8-slim
+LABEL author="Deepak Nadig" \
+      version="1.2" \
+      description="ERGO Edge Computing APIs."
 
 ENV STAGE /staging
 
@@ -10,14 +12,13 @@ WORKDIR $STAGE
 COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --no-cache-dir
 
-# We copy the rest of the codebase into the image
-COPY . .
+# Copy the codebase
+COPY app app
 
 ENV FLASK_APP app
 ENV FLASK_ENVIRONMENT development
 ENV FLASK_DEBUG=1
-
 
 CMD ["flask", "run", "--host=0.0.0.0"]
