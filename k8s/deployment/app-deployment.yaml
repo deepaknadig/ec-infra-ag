@@ -9,7 +9,8 @@ spec:
     app: flask-app
     tier: frontend
   ports:
-  - protocol: "TCP"
+  - name: flask-app
+    protocol: "TCP"
     port: 5000
     targetPort: 5000
   type: LoadBalancer
@@ -53,13 +54,5 @@ spec:
           image: deepnadig/ergo:1.2
           imagePullPolicy: Always
           ports:
-            - containerPort: 5000
-              name: flask-app
-#          Needs PV-Claim
-#          volumeMounts:
-#            - name: fa-persistent-storage
-#              mountPath: /path/to/folder
-#      volumes:
-#        - name: fa-persistent-storage
-#          persistentVolumeClaim:
-#            claimName: fa-pv-claim
+            - name: flask-app
+              containerPort: 5000
