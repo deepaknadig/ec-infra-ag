@@ -14,6 +14,19 @@ spec:
     targetPort: 5000
   type: LoadBalancer
 ---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: fa-service
+  labels:
+    team: frontend
+spec:
+  selector:
+    matchLabels:
+      app: flask-app
+  endpoints:
+  - port: flask-app
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -4,6 +4,8 @@ from flask_restx import Api
 from .device import api as device_api
 from .measurement import api as measurement_api
 
+from prometheus_flask_exporter import PrometheusMetrics
+
 app = Flask(__name__)
 app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.config.SWAGGER_UI_REQUEST_DURATION = True
@@ -19,8 +21,10 @@ api = Api(blueprint,
           contact="Deepak Nadig",
           default_mediatype='application/json')
 
-app.register_blueprint(blueprint)
+metrics = PrometheusMetrics(app=None)
 
 api.add_namespace(device_api)
 api.add_namespace(measurement_api)
 
+app.register_blueprint(blueprint)
+metrics.init_app(app)

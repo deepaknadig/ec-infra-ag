@@ -20,5 +20,6 @@ COPY app app
 ENV FLASK_APP app
 ENV FLASK_ENVIRONMENT development
 ENV FLASK_DEBUG=1
+ENV DEBUG_METRICS=false
 
 CMD ["flask", "run", "--host=0.0.0.0"]
