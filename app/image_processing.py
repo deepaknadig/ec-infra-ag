@@ -14,7 +14,6 @@ import skimage.segmentation as seg
 import skimage.color as color
 from pymongo import MongoClient
 
-UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 # db_statement
@@ -66,8 +65,14 @@ class process_image(Resource):
             return resp
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            process_img(filename)
+            file.seek(0)
+
+            image = np.array(Image.open(file))
+            ## alternative
+            #nparr = np.fromfile(file, np.uint8)
+            #image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+            process_img(image, filename)
             resp = jsonify({'message' : 'File successfully uploaded'})
             resp.status_code = 201
             return resp
@@ -77,8 +82,8 @@ class process_image(Resource):
             return resp
 
 def process_img(filename):
-    ## Felzenszwalb
-    image = io.imread(os.path.join(UPLOAD_FOLDER, filename))
+    ## Image segmentation using two methods
+    ## 1- Felzenszwalb
     image_felzenszwalb = seg.felzenszwalb(image)
     image_felzenszwalb_colored = color.label2rgb(image_felzenszwalb, image, kind='avg')
     f = BytesIO()
@@ -86,8 +91,8 @@ def process_img(filename):
     new_img.save(f, format=filename.split('.')[1])
     encoded = f.getvalue()
     col.insert({"filename": 'felzenszwalb_'+filename, "file": encoded, "description": "felzenszwalb segmentation" })
-    
-    ## SLIC( Simple Linear Iterative Clustering)
+
+    ## 2- SLIC( Simple Linear Iterative Clustering)
     image_slic = seg.slic(image,n_segments=155)
     image_slic_final = color.label2rgb(image_slic, image, kind='avg')
     f = BytesIO()
