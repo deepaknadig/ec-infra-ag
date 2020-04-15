@@ -21,7 +21,7 @@ api = Api(blueprint,
           contact="Deepak Nadig",
           default_mediatype='application/json')
 
-metrics = PrometheusMetrics(app=None)
+metrics = PrometheusMetrics(app=None, defaults_prefix='ergo')
 
 api.add_namespace(device_api)
 api.add_namespace(measurement_api)

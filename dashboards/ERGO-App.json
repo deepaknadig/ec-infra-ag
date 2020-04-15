@@ -95,7 +95,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "increase(flask_http_request_total[1m])",
+          "expr": "increase(ergo_http_request_total[1m])",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -370,7 +370,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(flask_http_request_duration_seconds_count{status=\"200\"}[1m])",
+          "expr": "rate(ergo_http_request_duration_seconds_count{status=\"200\"}[1m])",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -466,7 +466,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(flask_http_request_duration_seconds_count{status!=\"200\"}[1m]))",
+          "expr": "sum(rate(ergo_http_request_duration_seconds_count{status!=\"200\"}[1m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -562,7 +562,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(flask_http_request_duration_seconds_sum{status=\"200\"}[1m])\n/\nrate(flask_http_request_duration_seconds_count{status=\"200\"}[1m])",
+          "expr": "rate(ergo_http_request_duration_seconds_sum{status=\"200\"}[1m])\n/\nrate(ergo_http_request_duration_seconds_count{status=\"200\"}[1m])",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -658,7 +658,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "increase(flask_http_request_duration_seconds_bucket{status=\"200\",le=\"0.25\"}[1m]) \n/ ignoring (le) increase(flask_http_request_duration_seconds_count{status=\"200\"}[1m])",
+          "expr": "increase(ergo_http_request_duration_seconds_bucket{status=\"200\",le=\"0.25\"}[1m]) \n/ ignoring (le) increase(ergo_http_request_duration_seconds_count{status=\"200\"}[1m])",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -756,7 +756,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.5, rate(flask_http_request_duration_seconds_bucket{status=\"200\"}[1m]))",
+          "expr": "histogram_quantile(0.5, rate(ergo_http_request_duration_seconds_bucket{status=\"200\"}[1m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -851,7 +851,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.9, rate(flask_http_request_duration_seconds_bucket{status=\"200\"}[1m]))",
+          "expr": "histogram_quantile(0.9, rate(ergo_http_request_duration_seconds_bucket{status=\"200\"}[1m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
