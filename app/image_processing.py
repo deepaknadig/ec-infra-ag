@@ -2,6 +2,7 @@ import os
 import PIL
 from PIL import Image
 from io import BytesIO
+import numpy as np 
 
 import parsers
 from flask import Flask, request, redirect, jsonify, Response, Blueprint
