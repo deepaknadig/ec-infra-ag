@@ -49,6 +49,10 @@ spec:
       containers:
       - image: mongo:4
         name: mongo
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
         command:
           - mongod
           - "--bind_ip"
