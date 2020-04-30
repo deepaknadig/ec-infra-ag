@@ -51,7 +51,7 @@ spec:
         name: mongo
         resources:
           limits:
-            cpu: "200m"
+            cpu: "500m"
             memory: "128Mi"
         command:
           - mongod

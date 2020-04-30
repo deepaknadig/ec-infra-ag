@@ -51,11 +51,11 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: flask-app
-          image: deepnadig/ergo:1.3
+          image: deepnadig/ergo:1.4
           imagePullPolicy: Always
           resources:
             limits:
-              cpu: "200m"
+              cpu: "500m"
               memory: "128Mi"
           ports:
             - name: flask-app
