@@ -11,7 +11,7 @@ from flask_restx import Resource, Namespace
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 # db_statement
 # client = MongoClient('mongodb://localhost:27017/')
@@ -45,7 +45,7 @@ def allowed_file(filename):
 
 
 @api.route('/file-upload', methods=['POST'])
-class process_image(Resource):
+class ProcessImage(Resource):
     """Get new image and process it."""
 
     @api.doc(description='Process the received image and store it in the DB')
@@ -66,7 +66,7 @@ class process_image(Resource):
             file.seek(0)
 
             image = np.array(Image.open(file))
-            ## alternative
+            # alternative
             # nparr = np.fromfile(file, np.uint8)
             # image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
@@ -80,9 +80,9 @@ class process_image(Resource):
             return resp
 
 
-def process_img(filename):
-    ## Image segmentation using two methods
-    ## 1- Felzenszwalb
+def process_img(image, filename):
+    # Image segmentation using two methods
+    # 1- Felzenszwalb
     image_felzenszwalb = seg.felzenszwalb(image)
     image_felzenszwalb_colored = color.label2rgb(image_felzenszwalb, image, kind='avg')
     f = BytesIO()
@@ -91,7 +91,7 @@ def process_img(filename):
     encoded = f.getvalue()
     col.insert({"filename": 'felzenszwalb_' + filename, "file": encoded, "description": "felzenszwalb segmentation"})
 
-    ## 2- SLIC( Simple Linear Iterative Clustering)
+    # 2- SLIC( Simple Linear Iterative Clustering)
     image_slic = seg.slic(image, n_segments=155)
     image_slic_final = color.label2rgb(image_slic, image, kind='avg')
     f = BytesIO()
