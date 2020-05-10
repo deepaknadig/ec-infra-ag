@@ -10,6 +10,7 @@ from flask import jsonify
 from flask_restx import Resource, Namespace
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
+# import os
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
@@ -33,7 +34,7 @@ class DeviceWelcomePage(Resource):
         result = col.find()
         for item in result:
             image = Image.open(BytesIO(item["file"]))
-            # image.save(os.path.join(TEMP_FOLDER, item["filename"]))
+            # image.save(os.path.join('/tmp/', item["filename"]))
         # TODO: find() is not scalable.
         resp = jsonify({'message': 'Images successfully downloaded'})
         resp.status_code = 201
