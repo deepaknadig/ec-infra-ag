@@ -10,6 +10,7 @@ from flask import jsonify
 from flask_restx import Resource, Namespace
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
+import celery
 
 # import os
 
@@ -82,7 +83,7 @@ class ProcessImage(Resource):
             return resp
 
 
-@client.task(acks_late=True)
+@celery.task(acks_late=True)
 def process_img(image, filename):
     # Image segmentation using two methods
     # 1- Felzenszwalb

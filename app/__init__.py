@@ -17,7 +17,8 @@ app.config.RESTX_MASK_SWAGGER = False
 app.config.from_object(app.config)
 
 # Celery set up
-client = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
 
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 
