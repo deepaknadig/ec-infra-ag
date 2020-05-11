@@ -14,7 +14,7 @@ app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.config.SWAGGER_UI_REQUEST_DURATION = True
 app.config.RESTX_MASK_SWAGGER = False
 
-app.config.from_object(app.config)
+app.config.from_object('app.config')
 
 # Celery set up
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
