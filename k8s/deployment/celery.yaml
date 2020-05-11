@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker
+  labels:
+    app: flask-app
+spec:
+  selector:
+    matchLabels:
+      app: flask-app
+      tier: backend
+  replicas: 4
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: flask-app
+        tier: backend
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: flask-app
+          image: deepnadig/ergo:1.4
+          imagePullPolicy: Always
+          command: ['celery', '-A', 'app.celery' , 'worker', '-l', 'info', '--concurrency=1']
+          env:
+            - name: REDIS_HOST
+              value: redis-flask-service
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "768Mi"

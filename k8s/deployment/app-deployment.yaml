@@ -53,13 +53,12 @@ spec:
         - name: flask-app
           image: deepnadig/ergo:1.4
           imagePullPolicy: Always
-          command: ['celery', '-A', 'app.celery' , 'worker', '-l', 'info', '--concurrency=1']
           env:
             - name: REDIS_HOST
               value: redis-flask-service
           resources:
             limits:
-              cpu: "1000m"
+              cpu: "100m"
               memory: "512Mi"
           ports:
             - name: flask-app
