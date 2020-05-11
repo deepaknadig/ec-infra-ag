@@ -73,7 +73,7 @@ class ProcessImage(Resource):
             # nparr = np.fromfile(file, np.uint8)
             # image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            process_img(image, filename)
+            process_img.delay(image, filename)
             resp = jsonify({'message': 'File successfully uploaded'})
             resp.status_code = 201
             return resp
