@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-flask-service
+  labels:
+    app: flask-app
+spec:
+  selector:
+    app: flask-app
+    tier: redis
+  ports:
+  - name: redis-flask
+    protocol: "TCP"
+    port: 6379
+    targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-flask
+  labels:
+    app: flask-app
+spec:
+  selector:
+    matchLabels:
+      app: flask-app
+      tier: redis
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: flask-app
+        tier: redis
+    spec:
+      containers:
+        - name: redis-flask
+          image: redis
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          ports:
+            - name: redis-flask
+              containerPort: 6379

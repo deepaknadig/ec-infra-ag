@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flower-service
+spec:
+  selector:
+    app: flower
+  ports:
+    - port: 5555
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flower
+  labels:
+    app: flower
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: flower
+      labels:
+        app: flower
+    spec:
+      containers:
+        - name: flower
+          image: deepnadig/ergo:1.4
+          imagePullPolicy: Always
+          command: ['celery', 'flower', '-A', 'app' , 'flower']
+          ports:
+            - containerPort: 5555
+          env:
+            - name: REDIS_HOST
+              value: redis-flask-service
+          resources:
+            limits:
+              cpu: 100m
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: flower
