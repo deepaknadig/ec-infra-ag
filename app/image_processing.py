@@ -10,7 +10,6 @@ from flask import jsonify
 from flask_restx import Resource, Namespace
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-import celery
 import codecs, json
 
 # import os

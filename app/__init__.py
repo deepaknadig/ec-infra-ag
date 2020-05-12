@@ -14,11 +14,31 @@ app.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 app.config.SWAGGER_UI_REQUEST_DURATION = True
 app.config.RESTX_MASK_SWAGGER = False
 
-app.config.from_object('app.config')
+# app.config.from_object('app.config')
 
 # Celery set up
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-celery.conf.update(app.config)
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config['CELERY_RESULT_BACKEND'],
+        broker=app.config['CELERY_BROKER_URL']
+    )
+    celery.conf.update(app.config)
+
+    class ContextTask(celery.Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
+
+
+app.config.update(
+    CELERY_BROKER_URL='redis://redis-flask-service:6379',
+    CELERY_RESULT_BACKEND='redis://redis-flask-service:6379'
+)
+celery = make_celery(app)
 
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 

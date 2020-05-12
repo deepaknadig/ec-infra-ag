@@ -6,7 +6,6 @@ from flask_restx import Resource, fields, Namespace
 from bson.json_util import dumps
 from pymongo import MongoClient
 import time
-import celery
 
 api = Namespace('device', description='Ag-IoT Device operations APIs.')
 

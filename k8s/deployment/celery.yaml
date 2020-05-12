@@ -20,7 +20,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-        - name: flask-app
+        - name: celery-worker
           image: deepnadig/ergo:1.4
           imagePullPolicy: Always
           command: ['celery', '-A', 'app.celery' , 'worker', '-l', 'info', '--concurrency=1']
