@@ -76,7 +76,7 @@ class ProcessImage(Resource):
             # Numpy ndarray to json conversion
             json_dump_image = json.dumps({'image': image}, cls=NumpyEncoder)
 
-            process_img.delay(json_dump_image, filename)
+            process_img(json_dump_image, filename)
             resp = jsonify({'message': 'File successfully uploaded'})
             resp.status_code = 201
             return resp
@@ -86,7 +86,6 @@ class ProcessImage(Resource):
             return resp
 
 
-@celery.task(acks_late=True)
 def process_img(json_image, filename):
     # Preprocess json dump to image
     json_load = json.loads(json_image)

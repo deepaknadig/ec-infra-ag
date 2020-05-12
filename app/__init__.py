@@ -16,6 +16,7 @@ app.config.RESTX_MASK_SWAGGER = False
 
 # app.config.from_object('app.config')
 
+
 # Celery set up
 def make_celery(app):
     celery = Celery(
@@ -39,6 +40,7 @@ app.config.update(
     CELERY_RESULT_BACKEND='redis://redis-flask-service:6379'
 )
 celery = make_celery(app)
+app.logger.info(celery)
 
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 
