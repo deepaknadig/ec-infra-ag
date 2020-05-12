@@ -11,6 +11,7 @@ from flask_restx import Resource, Namespace
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 import celery
+import codecs, json
 
 # import os
 
@@ -73,7 +74,10 @@ class ProcessImage(Resource):
             # nparr = np.fromfile(file, np.uint8)
             # image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            process_img.delay(image, filename)
+            # Numpy ndarray to json conversion
+            json_dump_image = json.dumps({'image': image}, cls=NumpyEncoder)
+
+            process_img.delay(json_dump_image, filename)
             resp = jsonify({'message': 'File successfully uploaded'})
             resp.status_code = 201
             return resp
@@ -84,7 +88,11 @@ class ProcessImage(Resource):
 
 
 @celery.task(acks_late=True)
-def process_img(image, filename):
+def process_img(json_image, filename):
+    # Preprocess json dump to image
+    json_load = json.loads(json_image)
+    image = np.asarray(json_load["image"])
+
     # Image segmentation using two methods
     # 1- Felzenszwalb
     image_felzenszwalb = seg.felzenszwalb(image)
@@ -103,3 +111,10 @@ def process_img(image, filename):
     new_img.save(f, format=filename.split('.')[1])
     encoded = f.getvalue()
     col.insert({"filename": 'SLIC_' + filename, "file": encoded, "description": "SLIC segmentation"})
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
