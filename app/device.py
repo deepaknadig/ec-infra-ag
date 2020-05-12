@@ -5,6 +5,8 @@ from flask import request
 from flask_restx import Resource, fields, Namespace
 from bson.json_util import dumps
 from pymongo import MongoClient
+import time
+import celery
 
 api = Namespace('device', description='Ag-IoT Device operations APIs.')
 
@@ -41,6 +43,7 @@ class DeviceRoot(Resource):
     @api.doc(description='Shows the welcome page.')
     def get(self):
         """Print Welcome Page."""
+        test_task.delay(888, 111)
         host_address = request.host
         return Response('''<h1>Device API</h1>
             <p>IoT device operations API.</p>
@@ -84,3 +87,9 @@ class DeviceById(Resource):
         if s:
             return s, 200
         api.abort(404, "Device ID {} doesn't exist".format(device_id))
+
+
+@celery.task(acks_later=True)
+def test_task(a, b):
+    time.sleep(10)
+    return a + b
