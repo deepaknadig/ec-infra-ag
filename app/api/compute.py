@@ -19,7 +19,6 @@ import os
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 # db_statement
-# client = MongoClient('mongodb://localhost:27017/')
 db = mongo_client[config.MONGO_DATABASE]
 col = db["processed_images"]
 
@@ -37,7 +36,7 @@ class DeviceWelcomePage(Resource):
         result = col.find()
         for item in result:
             image = Image.open(BytesIO(item["file"]))
-            image.save(os.path.join('/tmp/', item["filename"]))
+            image.save(os.path.join(config.WORKER_STORE, item["filename"]))
         # TODO: find() is not scalable.
         resp = jsonify({'message': 'Images successfully downloaded'})
         resp.status_code = 201

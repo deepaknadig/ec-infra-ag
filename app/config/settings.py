@@ -5,6 +5,7 @@ class BaseConfig:
     SWAGGER_UI_DOC_EXPANSION = 'list'
     SWAGGER_UI_REQUEST_DURATION = True
     RESTX_MASK_SWAGGER = False
+    WORKER_STORE = '/data/worker'
 
 
 class DevConfig(BaseConfig):
