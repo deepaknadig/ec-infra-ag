@@ -30,9 +30,7 @@ RUN pip3 install redis celery flower --no-cache-dir --extra-index-url=https://ww
 # Copy the codebase
 COPY app app
 
-ENV FLASK_APP app
-ENV FLASK_ENVIRONMENT development
-ENV FLASK_DEBUG=1
-ENV DEBUG_METRICS=false
+WORKDIR $STAGE/app
+ENV APP_ENV=Dev
 
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["celery", "worker", "--workdir=.", "-A", "celery_worker.worker", "--loglevel=info"]
