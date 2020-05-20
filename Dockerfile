@@ -26,6 +26,7 @@ COPY requirements.txt .
 RUN pip3 install numpy --no-cache-dir --extra-index-url=https://www.piwheels.org/simple
 RUN pip3 install -r requirements.txt --no-cache-dir --extra-index-url=https://www.piwheels.org/simple
 RUN pip3 install redis celery flower --no-cache-dir --extra-index-url=https://www.piwheels.org/simple
+RUN pip3 install gunicorn[gevent] --no-cache-dir --extra-index-url=https://www.piwheels.org/simple
 
 # Copy the codebase
 COPY app app
