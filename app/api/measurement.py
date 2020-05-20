@@ -1,12 +1,12 @@
-from flask import Flask, Response, Blueprint
-from flask_restx import Api, Resource, fields, Namespace
-from pymongo import MongoClient
-import app.decision as dc
+from flask import Response
+from flask_restx import Resource, fields, Namespace
+from models import mongo_client
+import config
+import compute.fdss as dc
 from bson.json_util import dumps, loads
 
 # db_statement
-client = MongoClient('mongodb://mongo-flask-app:27017/')
-db = client["testdb"]
+db = mongo_client[config.MONGO_DATABASE]
 col = db["measurements"]
 
 api = Namespace('measurements', description='Manage Ag-IoT measurement API services.')

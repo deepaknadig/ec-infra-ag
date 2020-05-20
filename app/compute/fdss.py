@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import statistics as st
 from enum import Enum
 import json

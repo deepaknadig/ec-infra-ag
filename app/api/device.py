@@ -4,7 +4,9 @@ from flask import Response
 from flask import request
 from flask_restx import Resource, fields, Namespace
 from bson.json_util import dumps
-from pymongo import MongoClient
+from models import mongo_client
+from tasks import celery
+import config
 import time
 
 api = Namespace('device', description='Ag-IoT Device operations APIs.')
@@ -14,9 +16,8 @@ device_model = api.model('Device Data Model', {
     'timestamp': fields.Float(required=True, description='The measurement timestamp'),
 })
 
-# DB Connection
-client = MongoClient('mongodb://mongo-flask-app:27017/')
-db = client["devices"]
+# DB
+db = mongo_client[config.MONGO_DATABASE]
 col = db["device"]
 
 col.delete_many({})
@@ -43,9 +44,11 @@ class DeviceRoot(Resource):
     def get(self):
         """Print Welcome Page."""
         host_address = request.host
+        result = device_add.delay(1900, 47)
         return Response('''<h1>Device API</h1>
             <p>IoT device operations API.</p>
-            <h4>Host Address: {}</h4>'''.format(host_address))
+            <h4>Host Address: {}</h4>
+            <h4>Host Address: {}</h4>'''.format(host_address, result))
 
 
 @api.route('/devices')
@@ -85,3 +88,9 @@ class DeviceById(Resource):
         if s:
             return s, 200
         api.abort(404, "Device ID {} doesn't exist".format(device_id))
+
+
+@celery.task()
+def device_add(a, b):
+    time.sleep(10)
+    return a + b
