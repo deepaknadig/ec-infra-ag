@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: flask-app
       tier: backend
-  replicas: 4
+  replicas: 2
   strategy:
     type: Recreate
   template:
@@ -23,7 +23,7 @@ spec:
         - name: celery-worker
           image: deepnadig/ergo:1.4
           imagePullPolicy: Always
-          command: ['celery', '-A', 'app.celery' , 'worker', '-l', 'info', '--concurrency=1']
+          command: [ 'celery', 'worker', '--workdir=.', '-A', 'celery_worker.celery', '--loglevel=info' ]
           env:
             - name: REDIS_HOST
               value: redis-flask-service
@@ -31,3 +31,10 @@ spec:
             limits:
               cpu: "1000m"
               memory: "768Mi"
+          volumeMounts:
+            - name: worker-store
+              mountPath: /data/worker
+      volumes:
+        - name: worker-volume
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim # TODO: Change PVC for workers

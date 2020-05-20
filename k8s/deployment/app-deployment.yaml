@@ -39,7 +39,7 @@ spec:
     matchLabels:
       app: flask-app
       tier: frontend
-  replicas: 4
+  replicas: 2
   strategy:
     type: Recreate
   template:
