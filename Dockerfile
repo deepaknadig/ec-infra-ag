@@ -34,4 +34,4 @@ COPY app app
 WORKDIR $STAGE/app
 ENV APP_ENV=Dev
 
-CMD gunicorn --worker-class gevent --workers 4 --bind 0.0.0.0:5000 wsgi:app --log-level debug
+CMD gunicorn --worker-class gevent --workers 1 --bind 0.0.0.0:5000 wsgi:app --log-level debug
