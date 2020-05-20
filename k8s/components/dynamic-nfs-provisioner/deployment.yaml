@@ -5,7 +5,7 @@ metadata:
   labels:
     app: nfs-client-provisioner
   # replace with namespace where provisioner is deployed
-  namespace: default
+  namespace: nfs-provisioner
 spec:
   replicas: 1
   strategy:
@@ -31,9 +31,9 @@ spec:
             - name: NFS_SERVER
               value: 172.42.42.100
             - name: NFS_PATH
-              value: /srv/nfs/kubedata
+              value: /srv/nfs/kube
       volumes:
         - name: nfs-client-root
           nfs:
             server: 172.42.42.100
-            path: /srv/nfs/kubedata
+            path: /srv/nfs/kube
