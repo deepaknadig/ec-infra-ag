@@ -6,11 +6,13 @@ metadata:
     app: flask-app
 spec:
   ports:
-    - port: 27017
+  - name: mongo
+    port: 27017
+    targetPort: 27017
+  clusterIP: None
   selector:
     app: flask-app
     tier: mongo
-  type: LoadBalancer
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

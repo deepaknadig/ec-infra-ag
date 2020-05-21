@@ -18,6 +18,8 @@ metadata:
   name: fa-service
   labels:
     app: flask-app
+  annotations:
+    metallb.universe.tf/allow-shared-ip: ergo-application
 spec:
   selector:
     app: flask-app
@@ -28,6 +30,7 @@ spec:
     port: 5000
     targetPort: 5000
   type: LoadBalancer
+  loadBalancerIP: 10.10.10.100
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor

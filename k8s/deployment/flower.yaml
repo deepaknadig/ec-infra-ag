@@ -2,12 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: flower-service
+  annotations:
+    metallb.universe.tf/allow-shared-ip: ergo-application
 spec:
   selector:
     app: flower
   ports:
     - port: 5555
   type: LoadBalancer
+  loadBalancerIP: 10.10.10.100
 ---
 apiVersion: apps/v1
 kind: Deployment
