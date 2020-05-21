@@ -27,7 +27,7 @@ spec:
         - name: flower
           image: deepnadig/ergo:1.4
           imagePullPolicy: Always
-          command: ['celery', 'flower', '-A', 'app.celery' , 'flower']
+          command: ['celery', 'flower', '-A', 'celery_worker.celery' , 'flower']
           ports:
             - containerPort: 5555
           env:
