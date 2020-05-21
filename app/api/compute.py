@@ -122,7 +122,7 @@ class SlicSegmentation(Resource):
             return resp
 
 
-@celery.task()
+@celery.task(acks_late=True)
 def felzenszwalb_segmentation(json_image, filename):
     # Preprocess json dump to image
     json_load = json.loads(json_image)
@@ -139,7 +139,7 @@ def felzenszwalb_segmentation(json_image, filename):
     col.insert({"filename": 'felzenszwalb_' + filename, "file": encoded, "description": "felzenszwalb segmentation"})
 
 
-@celery.task()
+@celery.task(acks_late=True)
 def slic_segmentation(json_image, filename):
     # Preprocess json dump to image
     json_load = json.loads(json_image)
