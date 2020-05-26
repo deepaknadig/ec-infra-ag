@@ -23,14 +23,14 @@ spec:
         - name: celery-worker
           image: deepnadig/ergo:1.4
           imagePullPolicy: Always
-          command: [ 'celery', 'worker', '--workdir=.', '-A', 'celery_worker.celery', '--loglevel=info', '--concurrency=1' ]
+          command: [ 'celery', 'worker', '--workdir=.', '-A', 'celery_worker.celery', '--loglevel=info', '--concurrency=1', '--prefetch-multiplier=1' ]
           env:
             - name: REDIS_HOST
               value: redis-flask-service
           resources:
             limits:
               cpu: "1000m"
-              memory: "768Mi"
+              memory: "1Gi"
           volumeMounts:
             - name: worker-store
               mountPath: /data/worker

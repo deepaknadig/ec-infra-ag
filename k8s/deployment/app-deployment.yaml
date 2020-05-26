@@ -61,7 +61,7 @@ spec:
               value: redis-flask-service
           resources:
             limits:
-              cpu: "250m"
+              cpu: "500m"
               memory: "512Mi"
           ports:
             - name: flask-app
